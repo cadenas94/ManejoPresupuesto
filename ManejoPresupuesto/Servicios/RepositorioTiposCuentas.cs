@@ -7,10 +7,12 @@ namespace ManejoPresupuesto.Servicios
     public interface IRepositorioTiposCuentas
     {
         Task Actualizar(TipoCuenta tipoCuenta);
+        Task BorrarCuenta(int id);
         Task CrearTipoCuenta(TipoCuenta tipoCuenta);
         Task<bool> Existe(string nombre, int usuarioId);
         Task<IEnumerable<TipoCuenta>> Obtener(int usuarioId);
         Task<TipoCuenta> ObtenerPorId(int id, int usuarioId);
+        Task Ordenar(IEnumerable<TipoCuenta> tipoCuentasOrdenados);
     }
     public class RepositorioTiposCuentas: IRepositorioTiposCuentas
     {
@@ -24,8 +26,9 @@ namespace ManejoPresupuesto.Servicios
         {
             using var connection = new SqlConnection(connectionString);
 
-                var id = await connection.QuerySingleAsync<int>($@"INSERT INTO TiposCuentas (Nombre, UsuarioId, Orden) Values(@Nombre,@UsuarioId,0);
-                                                        SELECT SCOPE_IDENTITY(); ",tipoCuenta);
+                var id = await connection.QuerySingleAsync<int>("TiposCuentas_Insertar ",new {UsuarioId = tipoCuenta.UsuarioId, 
+                                                                                              nombre = tipoCuenta.Nombre},
+                                                                                              commandType: System.Data.CommandType.StoredProcedure);
                 tipoCuenta.Id = id;
             
         }
@@ -43,7 +46,7 @@ namespace ManejoPresupuesto.Servicios
         public async Task<IEnumerable<TipoCuenta>> Obtener(int usuarioId)
         {
             using var connection = new SqlConnection(connectionString);
-            return await connection.QueryAsync<TipoCuenta>(@"SELECT Id, Nombre, Orden FROM TIPOSCUENTAS WHERE USUARIOID= @usuarioId ", new { usuarioId });
+            return await connection.QueryAsync<TipoCuenta>(@"SELECT Id, Nombre, Orden FROM TIPOSCUENTAS WHERE USUARIOID= @usuarioId Order by ORDEN ", new { usuarioId });
 
         }
 
@@ -61,6 +64,22 @@ namespace ManejoPresupuesto.Servicios
             return await connection.QueryFirstOrDefaultAsync<TipoCuenta>(@"SELECT ID, NOMBRE, ORDEN FROM TIPOSCUENTAS WHERE ID= @Id AND USUARIOID = @UsuarioId "
                                                                             ,new {id, usuarioId});
 
+        }
+
+        public async Task BorrarCuenta(int id)
+        {
+            using var connection = new SqlConnection(connectionString);
+            await connection.ExecuteAsync(@"DELETE TIPOSCUENTAS WHERE ID = @Id ", new {id});
+
+        }
+
+        public async Task Ordenar(IEnumerable<TipoCuenta> tipoCuentasOrdenados)
+        {
+            //Dapper al recibir como parametro un IEnumerable de forma q ejecutara la query por cada tipocuenta que le pasemos.
+            var query = "UPDATE TIPOSCUENTAS SET ORDEN=@Orden WHERE ID=@Id;";
+            using var connection = new SqlConnection(connectionString);
+
+            await connection.ExecuteAsync(query, tipoCuentasOrdenados);
         }
     }
 }
