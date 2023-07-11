@@ -1,14 +1,17 @@
-﻿@model Transaccion
+﻿@model ReporteTransaccionesDetalladas
 
 @{
-    ViewData["Title"] = "Transacciones";
+    ViewData["Title"] = "Reporte Diario";
 
 
 }
 
-<h1>Indice de transacciones</h1>
-<h5>
-    Indices de transacciones
-</h5>
 
-<a asp-action="Crear" class="btn btn-primary mb-3">Crear Nuevo</a>
+<partial name="_Submenu" model="SubMenuTransacciones.Diario" />
+
+<div class="mb-3">
+    <a class="btn btn-primary" asp-controller="transacciones" asp-action="Crear">Crear nueva transaccion </a>
+</div>
+<partial name="_ReporteTransaccionesDetalladas" model="Model" />
+
+

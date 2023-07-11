@@ -15,18 +15,43 @@ namespace ManejoPresupuesto.Controllers
         private readonly IRepositorioCategorias repositorioCategorias;
         private readonly IRepositorioTransacciones repositorioTransacciones;
         private readonly IMapper mapper;
+        private readonly IServicioReportes servicioReportes;
 
         public TransaccionesController(IServicioUsuarios servicioUsuarios, IRepositorioCuentas repositorioCuentas, IRepositorioCategorias repositorioCategorias,
-                        IRepositorioTransacciones repositorioTransacciones, IMapper mapper)
+                        IRepositorioTransacciones repositorioTransacciones, IMapper mapper, IServicioReportes servicioReportes)
         {
             this.servicioUsuarios = servicioUsuarios;
             this.repositorioCuentas = repositorioCuentas;
             this.repositorioCategorias = repositorioCategorias;
             this.repositorioTransacciones = repositorioTransacciones;
             this.mapper = mapper;
+            this.servicioReportes = servicioReportes;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult>  Index(int mes, int año)
+        {
+            var usuarioId = servicioUsuarios.ObtenerUsuarioId();
+            var modelo = await servicioReportes.ReporteTransaccionesDetalladas(usuarioId, mes, año, ViewBag);
+            return View(modelo);
+        }
+
+        public async Task<IActionResult> Semanal(int mes, int año)
+        {
+            var usuarioId = servicioUsuarios.ObtenerUsuarioId();
+            IEnumerable<ResultadoObtenerPorSemana> transaccionesPorSemana = await servicioReportes.ObtenerReporteSemanal(usuarioId, mes, año, ViewBag);
+
+
+            return View();
+        }
+        public IActionResult Mensual()
+        {
+            return View();
+        }
+        public IActionResult ExcelReporte()
+        {
+            return View();
+        }
+        public IActionResult Calendario()
         {
             return View();
         }
