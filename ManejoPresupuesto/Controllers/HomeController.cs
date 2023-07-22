@@ -23,7 +23,8 @@ namespace ManejoPresupuesto.Controllers
             return View();
         }
 
-        public IActionResult NoEncontrado() {
+        public IActionResult NoEncontrado()
+        {
             return View();
         }
 

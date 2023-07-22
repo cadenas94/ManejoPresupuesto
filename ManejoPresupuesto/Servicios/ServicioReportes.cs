@@ -5,21 +5,24 @@ namespace ManejoPresupuesto.Servicios
     public interface IServicioReportes
     {
         Task<IEnumerable<ResultadoObtenerPorSemana>> ObtenerReporteSemanal(int usuarioId, int mes, int año, dynamic ViewBag);
+        Task<ReporteTransaccionesDetalladas> ObtenerReporteTransaccionesDetalladas(int usuarioId, int mes, int año, dynamic ViewBag);
         Task<ReporteTransaccionesDetalladas> ObtenerReporteTransaccionesDetalladasPorCuenta(int usuarioId, int cuentaId, int mes, int año, dynamic ViewBag);
-        Task<ReporteTransaccionesDetalladas> ReporteTransaccionesDetalladas(int usuarioId, int mes, int año, dynamic ViewBag);
     }
+
     public class ServicioReportes: IServicioReportes
     {
         private readonly IRepositorioTransacciones repositorioTransacciones;
-
         private readonly HttpContext httpContext;
-        public ServicioReportes(IRepositorioTransacciones repositorioTransacciones, IHttpContextAccessor httpContextAccessor)
+
+        public ServicioReportes(IRepositorioTransacciones repositorioTransacciones,
+            IHttpContextAccessor httpContextAccessor)
         {
             this.repositorioTransacciones = repositorioTransacciones;
             this.httpContext = httpContextAccessor.HttpContext;
-        }      
+        }
 
-        public async Task<IEnumerable<ResultadoObtenerPorSemana>> ObtenerReporteSemanal (int usuarioId, int mes, int año, dynamic ViewBag)
+        public async Task<IEnumerable<ResultadoObtenerPorSemana>> ObtenerReporteSemanal(int usuarioId,
+            int mes, int año, dynamic ViewBag)
         {
             (DateTime fechaInicio, DateTime fechaFin) = GenerarFechaInicioYFin(mes, año);
 
@@ -34,8 +37,9 @@ namespace ManejoPresupuesto.Servicios
             var modelo = await repositorioTransacciones.ObtenerPorSemana(parametro);
             return modelo;
         }
-        
-        public async Task<ReporteTransaccionesDetalladas> ReporteTransaccionesDetalladas(int usuarioId, int mes, int año, dynamic ViewBag)
+
+        public async Task<ReporteTransaccionesDetalladas> 
+            ObtenerReporteTransaccionesDetalladas(int usuarioId, int mes, int año, dynamic ViewBag)
         {
             (DateTime fechaInicio, DateTime fechaFin) = GenerarFechaInicioYFin(mes, año);
 
@@ -48,14 +52,15 @@ namespace ManejoPresupuesto.Servicios
 
             var transacciones = await repositorioTransacciones.ObtenerPorUsuarioId(parametro);
 
-            var modelo = GenerarReporteTransaccionesDetalladas(fechaInicio, fechaFin, transacciones);
+            var modelo = GenerarReporteTransaccionesDetalladas(fechaInicio, 
+                fechaFin, transacciones);
             AsignarValoresAlViewBag(ViewBag, fechaInicio);
-
             return modelo;
-
         }
 
-        public async Task<ReporteTransaccionesDetalladas> ObtenerReporteTransaccionesDetalladasPorCuenta(int usuarioId, int cuentaId, int mes, int año, dynamic ViewBag)
+        public async Task<ReporteTransaccionesDetalladas> 
+            ObtenerReporteTransaccionesDetalladasPorCuenta(int usuarioId, int cuentaId, 
+            int mes, int año, dynamic ViewBag)
         {
             (DateTime fechaInicio, DateTime fechaFin) = GenerarFechaInicioYFin(mes, año);
 
@@ -67,10 +72,11 @@ namespace ManejoPresupuesto.Servicios
                 FechaFin = fechaFin
             };
 
-            var transacciones = await repositorioTransacciones.ObtenerPorCuentaId(obtenerTransaccionesPorCuenta);
+            var transacciones = await repositorioTransacciones
+               .ObtenerPorCuentaId(obtenerTransaccionesPorCuenta);
+
             var modelo = GenerarReporteTransaccionesDetalladas(fechaInicio, fechaFin, transacciones);
             AsignarValoresAlViewBag(ViewBag, fechaInicio);
-
             return modelo;
         }
 
@@ -88,12 +94,13 @@ namespace ManejoPresupuesto.Servicios
             var modelo = new ReporteTransaccionesDetalladas();
 
 
-            var transaccionesPorFecha = transacciones.OrderByDescending(x => x.FechaTransaccion).GroupBy(x => x.FechaTransaccion)
-                .Select(grupo => new ReporteTransaccionesDetalladas.TransaccionesPorFecha()
-                {
-                    FechaTransaccion = grupo.Key,
-                    Transacciones = grupo.AsEnumerable()
-                });
+            var transaccionesPorFecha = transacciones.OrderByDescending(x => x.FechaTransaccion)
+                        .GroupBy(x => x.FechaTransaccion)
+                        .Select(grupo => new ReporteTransaccionesDetalladas.TransaccionesPorFecha()
+                        {
+                            FechaTransaccion = grupo.Key,
+                            Transacciones = grupo.AsEnumerable()
+                        });
 
             modelo.TransaccionesAgrupadas = transaccionesPorFecha;
             modelo.FechaInicio = fechaInicio;
@@ -115,6 +122,7 @@ namespace ManejoPresupuesto.Servicios
             {
                 fechaInicio = new DateTime(año, mes, 1);
             }
+
             fechaFin = fechaInicio.AddMonths(1).AddDays(-1);
 
             return (fechaInicio, fechaFin);

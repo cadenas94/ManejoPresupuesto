@@ -3,21 +3,21 @@
 @{
     ViewData["Title"] = "Tipos Cuentas";
 }
-<h1>Tipos de cuentas</h1>
-<h5>El tipo de cuenta se refiere a  cómo podemos agrupar cuentas.
-     Ejemplos: Préstamos, tarjetas de crédito, etc
-</h5>
 
-<a asp-action="Crear" class="btn btn-primary mb-3">Crear nuevo</a>
+<h1>Tipos de Cuentas</h1>
+<h5>El tipo de cuenta se refiere a cómo podemos agrupar cuentas. 
+    Ejemplos: Préstamos, tarjetas de crédito, etc.</h5>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>Acciones</th>
-            <th>Nombre</th>
-        </tr>
-    </thead>
-    <tbody id="reordenable">
+  <a asp-action="Crear" class="btn btn-primary mb-3">Crear nuevo</a>
+
+  <table class="table">
+      <thead>
+          <tr>
+              <th>Acciones</th>
+              <th>Nombre</th>
+          </tr>
+      </thead>
+      <tbody id="reordenable">
         @foreach (var tipoCuenta in Model)
         {
             <tr>
@@ -29,44 +29,48 @@
                 <td>
                     @tipoCuenta.Nombre
                 </td>
+
             </tr>
         }
     </tbody>
-</table>
+  </table>
 
-@section Scripts{
-    <script>
-        const urlOrdenar = '@Url.Action("ordenar")';
+  @section Scripts {
+      <script>
 
-        $(function(){
-            $("#reordenable").sortable({
-                stop: async function(e, ui){
-                    await actualizarOrdenes();
-                }
-            });
-            async function actualizarOrdenes(){
-                const ids = obtenerIdsDeElementos();
-                await enviarIdsAlBackend(ids);
-            }
-            function obtenerIdsDeElementos(){
-                const ids=$(".ids").map(function(){
-                    return $(this).val();
-                }).get();
+          const urlOrdenar = '@Url.Action("ordenar")';
 
-                return ids;
-            }
+          $(function(){
+              $("#reordenable").sortable({
+                  stop: async function(e, ui){
+                      await actualizarOrdenes();
+                  }
+              });
 
-            async function enviarIdsAlBackend(ids){
-                var data= JSON.stringify(ids);
-                await fetch(urlOrdenar ,{
-                    method: 'POST',
-                    body: data,
-                    headers: {
-                        'Content-type': 'application/json'
-                    }
-                });
+              async function actualizarOrdenes(){
+                  const ids = obtenerIdsDeElementos();
+                  await enviarIdsAlBackend(ids);
+              }
 
-            }
-        })
-    </script>
-}
+              function obtenerIdsDeElementos(){
+                  const ids = $(".ids").map(function(){
+                      return $(this).val();
+                  }).get();
+
+                  return ids;
+              }
+
+              async function enviarIdsAlBackend(ids){
+                  var data = JSON.stringify(ids);
+
+                  await fetch(urlOrdenar, {
+                      method: 'POST',
+                      body: data,
+                      headers: {
+                          'Content-Type': 'application/json'
+                      }
+                  });
+              }
+          })
+      </script>
+  }
