@@ -3,7 +3,7 @@
 -- Create date: <Create Date,,>
 -- Description:	<Description,,>
 -- =============================================
-CREATE PROCEDURE SP_Prueba
+CREATE PROCEDURE [dbo].[SP_Prueba]
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -11,5 +11,5 @@ BEGIN
 	SET NOCOUNT ON;
 
     -- Insert statements for procedure here
-	SELECT 1
+	SELECT 5
 END
