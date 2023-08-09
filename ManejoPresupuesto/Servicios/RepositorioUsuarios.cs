@@ -27,8 +27,8 @@ namespace ManejoPresupuesto.Servicios
                         SELECT SCOPE_IDENTITY();
                         ", usuario);
 
-            await connection.ExecuteAsync("CrearDatosUsuarioNuevo", new { usuarioId },
-                commandType: System.Data.CommandType.StoredProcedure);
+            //await connection.ExecuteAsync("CrearDatosUsuarioNuevo", new { usuarioId },
+            //    commandType: System.Data.CommandType.StoredProcedure);
 
             return usuarioId;
         }
